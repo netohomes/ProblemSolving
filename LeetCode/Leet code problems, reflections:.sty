@@ -1,0 +1,567 @@
+Leet code problems, reflections:
+
+-------------------------------------------------------------------------------
+3355. Zero Array Transformation I
+
+To solve this problem I used the DIFFERENCE ARRAY technique. Basically first you construct the difference array and then you can apply the update queries on the difference array. Once it has been applied all queries you can build again the updated array using the difference array.
+
+This method/technique looks similar to lazy propagation used in segment trees. It is like you apply the queries only on L and R+1 and then get the result when it is built the updated array. Also it looks like the difference array and the segment trees are kind of similar, I still need to check this because I'm not sure how.
+
+-------------------------------------------------------------------------------
+2901. Longest Unequal Adjacent Groups Subsequence II
+
+This was a tough one. Actually I needed to see the solution because the hints were not clear enough for me.
+
+To solve it was needed to keep track of the longest subsequence that satisfies the conditions (hamming distance and not the same group for j and j+1 elements in the subsequence) from 0 <= i < n.
+To solve it is needed a nested loop (O(n^2)) for each word[i]. You would need to check for the current word i all the previous solutions dp[j] and if in one of them can be added the current word[i], then do it, otherwise the longest subsequence would be the word[i] itself.
+
+This is a DP problem. We save previous solutions and use them to create new ones. I will need to read this tomorrow to make sure it is clear to me.
+-------------------------------------------------------------------------------
+73. Set Matrix Zeroes
+
+You need first to read the problem to understand it, the requirement is prettry stright forward.
+
+The solution is to use the first row and first column to keep track of the rows and columns that need to set to 0.
+But at the beginning you also need to check if the first row and/or the first column need to set to 0, because once you start to use them as records you will write zeros that were not there at the beginning.
+-------------------------------------------------------------------------------
+3362. Zero Array Transformation III
+
+This was a tough one.
+
+It is requested to make an array of numbers zero all of them given a list of queries [L,R].
+When you apply a query you can decrease at most by one any given value. If a value is already zero, then there is no need to substract 1.
+
+The idea to solve is to use a greedy approach: to use the queries that are larger so most of the values in the array are affected when the query is applied.
+Using the larger ones we can ensure that the minimum amount of queries will be used.
+
+The solution also requires to sort first the queries by start point L.
+Then use a max-heap to keep track of the queries that can be used and a min-heap to keep track of the queries that are already in use. For both heaps it will be
+used the R value of the queries. The max-heap it will allow us to use the queries that end [L,R] farthest (larger R) and the min-heap will allow to check which queries 
+can or cannot affect anymore since we have passed its range (R is behind).
+
+So we iterate each index i on the array and discard the queries in the min-heap that can no longer be used (R < i). Then add all ones that are available (L <= i <= R)
+to the max-heap. The max-heap will ensure that we use the queries with the larger range [L,R].
+
+If for a given index i in the array there are not enough queries that can make its value zero, then it is the case when we return -1 because it was not possible.
+-------------------------------------------------------------------------------
+3372. Maximize the Number of Target Nodes After Connecting Trees I
+
+The problem it was solved using BFS to find the number of nodes that are a distance k or less from the root node.
+Both trees are unidrected trees and don't have loops (acyclic graphs).
+-------------------------------------------------------------------------------
+98. Validate Binary Search Tree
+
+A key property of traversing a VALID BST using the inorder DFS is that you get the nodes in increaseing order.
+-------------------------------------------------------------------------------
+2929. Distribute Candies Among Children II
+
+This would have take me several days even to get a proper solution. I do not have that many days so I looked in the hints.
+
+The idea to solve it is iterating through how many candies can be given to the first child.
+
+For the first child we can give from 0 <= i <= min(limit,n) candies.
+Doing a loop for the valid values for i we have:
+	- The case where n - i > 2limit, meaning that there is not way we can share the n candies
+	- When the before no happens, we can give to the second child at least max(n-i-limi,0) and at most min(n-i,limit)
+	So for a given i we can share the candies between the second and third child in min(n-i,limit) - max(n-i-limit,0) + 1 ways
+	The number 1 is to do an inclusive count (for example between 6 and 5 there are two numbers)
+
+This was more like a combinary problem.
+-------------------------------------------------------------------------------
+2359. Find Closest Node to Given Two Nodes
+
+At the beginning I tried to get both paths for both nodes and find the intersection node for both paths. This idea did not work that good
+since the graph can contain cycles.
+
+A much better and simple idea was to calculate the distance from both starting nodes to each node in the graph.
+Then we only need to check which node is the closes one to both nodes. Using this idea the issue with cycles was solved. 
+This a good example that the right approach to solve the problem makes the difference.
+
+Also here I learned/remembered that BFS can be applied also to directed graphs.
+-------------------------------------------------------------------------------
+386. Lexicographical Numbers
+
+To solve this my idea was to "expand" each number while the number being generated is less than n.
+For example, the expansion of 1 would be:
+
+1 2
+10 11 ... 19|
+100 101 ... 109|110 111 ... 119|120 121 ... 129|
+1000
+
+In this case n=1000. The implementation was done doing recursive calls. The expansion means multiplying by 10 and add from 0 to 9.
+If you look, this looks like a DFS solution.
+-------------------------------------------------------------------------------
+3170. Lexicographically Minimum String After Removing Stars
+
+
+My solution was to use a priority queue to save the each character and its position.
+Having this whenever a * is found, from the queue I get the char to delete and its position.
+If theere are several characters that can be deleted, the closest ones the * are the first to be deleted.
+-------------------------------------------------------------------------------
+1061. Lexicographically Smallest Equivalent String
+
+For the solution is necessary to find the equivalent characters from s1 and s2. Finding the equivalency
+is like building and adjacency list for each character. Then we can use an algorithm to visit the nodes
+and find the lexicographically smallest equivalent.
+-------------------------------------------------------------------------------
+2616. Minimize the Maximum Difference of Pairs
+
+Tags: greedy, binary search
+
+Note 1: This is a DP problem. I will be back. I'm checking the common patterns to solve DP problemes.
+Note 2: The hints were not correct and it turns out it is not a DP problem. It is greedy + binary search.
+
+You are given a 0-indexed integer array nums and an integer p. Find p pairs of indices of nums such that the maximum difference amongst all the pairs is minimized. Also, ensure no index appears more than once amongst the p pairs.
+
+Note that for a pair of elements at the index i and j, the difference of this pair is |nums[i] - nums[j]|, where |x| represents the absolute value of x.
+
+Return the minimum maximum difference among all p pairs. We define the maximum of an empty set to be zero.
+
+Solution:
+
+The way to solve it, it is first to think how to solve it with brute force: think we iterate trough all 
+the possible difference values. We can start getting all the pairs that have a difference less or equal to 0, then 1, 2, ...
+
+The number of pairs will increase for each case F(0) <= F(1) <= F(2)... (F(x) -> gives the number of pairs that have a difference equal or less than x)
+And we can use binary search to find the value of x for p pairs.
+
+Now a very good question is how we calculate F(x)? How many valid pairs have a difference equal or less than x?
+The idea is to use a greedy approach. The approach is:
+
+1. Sort the array in increasing order
+2. For a given i, if arr[i+1] - arr[i] <= x, then i,i+1 are a valid pair and we can continue with i + 2
+
+It sounds fantastic, but how can we prove this? (The problem with the greedy algorithms)
+
+By contradiction: let's imagine that we have an sorted array and we have two approaches to get the number of pairs (one of them is the greedy aproached and other that is best).
+
+Let's say that up to index i-1 both approaches generate the same of pairs. So the next pair for our algorithm will be i,i+1, so the other approach will select i+1.i+2.
+This is because in order to create a pair for i + 1, either you select the previous element i or the next one i+2 because the array is sorted.
+So now we have to create pairs from i+2,...,n for our greedy approach and from i+3,...,n for the other approach. Since our greedy approach always select
+the leftmost elements to create the pairs and we have more elements in i+2,...,n so we know that the greedy approach will create more pairs than the other one.
+So the second approach is not better that our greedy approach!!!!!
+-------------------------------------------------------------------------------
+2311. Longest Binary Subsequence Less Than or Equal to K
+
+Tags: greedy
+
+Problem:
+You are given a binary string s and a positive integer k.
+
+Return the length of the longest subsequence of s that makes up a binary number less than or equal to k.
+
+Note:
+
+The subsequence can contain leading zeroes.
+The empty string is considered to be equal to 0.
+A subsequence is a string that can be derived from another string by deleting some or no characters without changing the order of the remaining characters.
+
+Solution:
+
+This can be solved using a greedy approach. Imagine we have the following input:
+
+
+s: 000100010100100011
+k:         0010001010 k in its binary form
+
+So in order to the the subsequence with the largest length we need to try to make smaller s by deleting 1s.
+So, how do we achieve this? We could think to delete ones from the right, in the middle or from the left.
+So how do we get the longest length and make s smaller? 
+We need to start deleting from the left to the right the 1s until we get a number that is equal or smallest to k.
+It can be proven that this greedy approach will gave us the longest length making s smaller at the same time.
+
+The implementation I did was a bit long. Two methods that I needed was toBinary(string) to convert k to a binary string
+and isLargerThan(string, string) which takes two binary strings and compares them.
+
+When doing the toBinary method remember to reverse the string and the end. When doing the isLargerThan method remember start
+from the right in both strings and compare one by one bit until one of the strings is fully covered, then you would need to continue
+to check the remaining bits for the other string.
+-------------------------------------------------------------------------------
+Note: when implementing a binary search follow the template:
+
+Given l,r,target and F(x)
+
+while (l < r) {
+	m = (l+r)/2 // Integer division
+	if (F(m) < target) {
+		l = m + 1 // This is very important to avoid infinite while loop because l < r always
+	} else {
+		r = m
+	}
+}
+
+-------------------------------------------------------------------------------
+Dynamic Programming Patterns
+
+...........................................................
+
+Group 1: warmup
+
+Climbing stairs (LeetCode 70)
+
+So the problem consists of climbing a stair and you can go up one or 2 steps at the time. So how many ways you can climb the stair?
+The solution is like creating an induction proof.
+
+In this case we know that at step i either you come from i-1 or i-2 (because you can only go up 1 or 2 steps). Then we can say that
+
+f(i) = f(i-1) + f(i-2), where f(i) is the solution at step i
+
+Now we only need to have the base cases. We can know that
+
+f(0) = 1 -> Because there is only ONE way to be there and that is stay there
+f(1) = 1 -> Because you can only reach step 1, by going up 1 step
+
+With there two base cases we can build any f(i).
+
+...........................................................
+
+Group 2: Linear sequence with constant transition
+
+DP solution requires us to solve the sub-problem on every prefix on the array. A prefix of the array is a subarray from 0 to i for some i.
+
+Min cost climbing statis (LeetCode 746)
+
+This is a similar problem to the previous one. It is about climbing a stair going up one or two steps, but this time there is a cost to do the step.
+So we can also do:
+
+f(i) = f(i-1) + f(i-2), where f(i) is the minimum cost to reach step i
+
+Now, based on the problem's description we can start from step 0 or step 1, meaning that:
+
+f(0) = 0
+f(1) = 0
+
+Do not confuse this with the cost to do step from any step i. Having this we can build the solutionn.
+...........................................................
+Group 3: on grids
+
+DP table will have the same dimensions as grid, the state at cell i,j will be related to the grid i,j
+
+Unique paths (LeetCode 62)
+
+There is a robot on an m x n grid. The robot is initially located at the top-left corner (i.e., grid[0][0]). The robot tries to move to the bottom-right corner (i.e., grid[m - 1][n - 1]). The robot can only move either down or right at any point in time.
+
+Given the two integers m and n, return the number of possible unique paths that the robot can take to reach the bottom-right corner.
+
+The test cases are generated so that the answer will be less than or equal to 2 * 109.
+
+Solution:
+
+Like in previous cases we need to build the solution from previous ones (like in induction proofs).
+In this case at a specific location i,j we can only come from the left (i,j-1) or from the top (i-1,j). So we can do:
+
+f(i,j) = f(i,j-1) + f(i-1,j), where f(i,j) is the number of unique paths to reach i,j position
+
+The detail here is the base case. We start at 0,0 then what is f(0,0) = ??
+If we think it as the number of ways to reach 0,0 because we can reach it the path is staying there, so there is one path:
+
+f(0,0) = 1
+
+For some reason this reasoning sometimes does not make sense to me, I mean why f(0,0) = 0 is not valid, since there is not path
+needed to reach 0,0 since we start from there.
+It feels like at 0,0 there is a circular path that starts at 0,0 and comes back to 0,0. I think this is a good way to think about it, but still there is 
+something about it that bothers me.
+
+...........................................................
+
+Group 4: two sequences O(NM) style
+
+DP[i][j] is some value related to the problem solved on prefix sequence 1 with length i, and prefix on sequence 2 with length j.
+
+Longest common subsequence (LeetCode 1143)
+
+Given two strings text1 and text2, return the length of their longest common subsequence. If there is no common subsequence, return 0.
+
+A subsequence of a string is a new string generated from the original string with some characters (can be none) deleted without changing the relative order of the remaining characters.
+
+For example, "ace" is a subsequence of "abcde".
+A common subsequence of two strings is a subsequence that is common to both strings.
+
+Solution:
+
+Trick: consider the last character
+
+For this problem we also need a matrix (grid) to solve it. Also the idea is to build the solution from previous solutions.
+We have that for given (i,j) where i is an index on text1 and j is an index on text2 we have that:
+
+F(i,j) = F(i-1,j-1) + 1 if text1[i] = text2[j]
+         max(F(i,j-1), F(i-1,j))
+
+F(i,j) -> longest common subsequence for the strings text1[1:i] and text2[1:j]
+
+I was thinking that the solution should be more like:
+F(i,j) = F(i-1,j-1) + 1 if text1[i] = text2[j]
+         max(F(i,j-1), F(i-1,j), F(i-1,j-1))
+
+But it seems F(i-1,j-1) is covered when doing F(i,j-1), F(i-1,j). Even I'm not sure how to prove it.
+
+My reasoning is like, for a given i,j indexes we can (we use the last character):
+
+1. If text1[i] = text2[j] then the solution is F(i,j) = F(i-1,j-1) + 1
+2. If it is not the case we have 3 cases:
+	a. text1[i] may be part of the longest common subsequence
+	b. text2[j] may be part of the longest common subsequence
+	c. Neither text1[i] or text2[j] are part of the longest common subsequence
+
+For me this is seems pretty reasonable, but the official solution does not include case 3 for some reason. Maybe 
+as mentioned early is because the 2.c case is already included in 2.a and 2.b
+
+
+And important thing I'm missing here, the base case?!!! We know that
+F(0,j) = 0 for any 1 <= j <= text2.size()
+F(i,0) = 0 for any 1 <= i <= text1.size()
+
+...........................................................
+
+Group 5: interval dp
+
+DP problems are solved on every single interval (subarray) of the array
+
+Longest Palindromic Subsequence (LeetCode 516)
+
+Given a string s, find the longest palindromic subsequence's length in s.
+
+A subsequence is a sequence that can be derived from another sequence by deleting some or no elements without changing the order of the remaining elements.
+
+Solution:
+
+Trick: consider first and last character
+
+So again, we need to build our solution based on previous solutions and determine the base cases.
+Following the trick we will have the following cases:
+
+F(l,r) = 2 + F(l+1,r+1), if s[l] = s[r] or
+         max(F(l+1,r), F(l, r-1))
+
+l and r are inclusive
+
+So basically we pay attention to the first and last character, and if they are equal or not we build our new solution. The base cases we have are:
+
+F(l,r) = 1, when l=r
+F(l,r) = 0, when l > r
+
+The solution in this case is pretty similar to the previous case and also it came to my mind that the solution should be:
+
+F(l,r) = 2 + F(l+1,r+1), if s[l] = s[r] or
+         max(F(l+1,r), F(l, r-1), F(l+1,r-1))
+
+But maybe it is not included for the same reason.
+
+Unlike previous case, this one seems to be easier if it is implemented using recursion (not sure if this is true but the example I saw was impmlemented using 
+recursion, a top-down approach).
+
+...........................................................
+
+Group 6: linear sequence transition like N^2 Longest Increasing Subsequence)
+
+DP problem is solved on every prefix of the array. Transition si from every index j < i
+
+Partition Array for Maximum Sum (LeetCode 1043)
+
+Given an integer array arr, partition the array into (contiguous) subarrays of length at most k. 
+After partitioning, each subarray has their values changed to become the maximum value of that subarray.
+
+Return the largest sum of the given array after partitioning. Test cases are generated so that the answer fits in a 32-bit integer.
+
+Trick: use the last element and consider all the k partitions it can be part of.
+
+Solution:
+The induction rule for this problem is
+F(i) = max(F(i-1) + arr[i], F(i-2) + 2*arr[i], .... , F(i-k) + k*arr[i])
+
+Where F(i) is the solution for the prefix of length i.
+
+Base case:
+F(0) = 0
+
+The implemention can be done using an array of length n + 1 in a bottom-up way.
+
+...........................................................
+Group 7: knapsack like
+
+DP state is similar to the classical knapsack problem.
+
+
+
+-------------------------------------------------------------------------------
+
+
+[9,1,2,7,1,3,5,5,20,4,1,9,0] p = 3
+
+1,1 -> 0
+2,3 -> 1
+7,9 -> 2
+
+5,5 -> 0
+1,1 -> 0
+2,3 -> 1
+
+
+[10,1,2,7,1,3]
+
+1,1,2,3,7,10
+
+
+-------------------------------------------------------------------------------
+
+1 10 100 1000 101 102 103 104 105 106 107 108 109 11 110 111 112 113
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+n <= limit
+n-1 <= limit
+n-2 <= limit
+
+discard all where any of the 3 selections is greater than limit
+
+limit
+
+
+n + 1 -> a, 0 <= a <= n and 0 <= a <= limit
+n + 1 - a -> b, 0 <= b < n - a
+
+
+n = 7 limit = 3
+
+3 3 1
+2 3 2
+1 3 3
+
+3 2 2
+3 1 3
+
+
+n = 5 l = 7
+
+5 0 0 
+4 1 0
+4 0 1
+3 2 0
+3 0 2
+3 1 1
+2 3 0
+2 0 3
+
+
+0 -> 0 0 0
+1 -> 1 0 0|0 1 0|0 0 1
+2 -> 2 0 0|0 2 0|0 0 2|1 1 0|0 1 1|1 0 1
+(3,1) + (3,2)
+3 -> 
+
+
+
+
+
+aaa aab aac bba bbb bbc bbd
+
+dp =  1 1 1 1 1 1 1
+
+
+i= 1
+j= 0
+dp = 1 2 1 1 1 1 1
+
+i= 2
+j= 0
+dp = 1 2 2 1 1 1 1
+
+i= 2
+j= 1
+dp = 1 2 3 1 1 1 1
+
+
+i= 3
+j= 0
+dp = 1 2 3 1 1 1 1
+
+i= 3
+j= 1
+dp = 1 2 3 1 1 1 1
+
+i= 3
+j= 2
+dp = 1 2 3 1 1 1 1
+
+i= 4
+j= 0
+dp = 1 2 3 1 1 1 1
+
+i= 4
+j= 1
+dp = 1 2 3 1 1 1 1
+
+i= 4
+j= 2
+dp = 1 2 3 1 1 1 1
+
+i= 4
+j= 3
+dp = 1 2 3 1 2 1 1
+
+
+1,  2, 3, 4
+5,  0, 7, 8
+0, 10,11,12
+13,14,15, 0
+
+
+1 0 1 1 1 1
+1 1 1 1 1 1
+0 1 1 1 1 1
+1 1 1 1 0 1
+1 1 1 1 1 1
+
+
+1 0 3
+
+
+1 0 1
+1 1 1
+1 1 1
+
+
+[0,1,2,0]
+[3,4,5,2]
+[1,3,1,5]
+
+
+1001010101011
+
+
+00100010001
+
+
+001001
+010000
+000111
+000101
+
+0010110
+0000100
+
+0010110
+
+000000011
+001000000
+
+
+00101
+00100
+
+
+
+
